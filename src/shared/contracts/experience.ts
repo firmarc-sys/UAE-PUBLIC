@@ -1,20 +1,54 @@
-export type ExperienceId =
-  | 'interweb'
-  | 'augment'
-  | 'code'
-  | 'scribe'
-  | 'optics';
+export const EXPERIENCES = [
+  'router',
+  'interweb',
+  'augment',
+  'code',
+  'scribe',
+  'optics',
+  'gid',
+  'settings',
+  'execution',
+  'results',
+] as const;
 
-export interface ExperienceDefinition {
+export type ExperienceId = (typeof EXPERIENCES)[number];
+
+export const EXPERIENCE_ICONS = [
+  'globe',
+  'infinity',
+  'code',
+  'scribe',
+  'aperture',
+  'identity',
+  'settings',
+  'terminal',
+  'sparkles',
+] as const;
+
+export type ExperienceIcon = (typeof EXPERIENCE_ICONS)[number];
+
+export type ExperienceStatus =
+  | 'idle'
+  | 'loading'
+  | 'ready'
+  | 'working'
+  | 'needs_input'
+  | 'empty'
+  | 'offline'
+  | 'error';
+
+export type ExperienceDescriptor = {
   id: ExperienceId;
   label: string;
+  tagline: string;
   description: string;
-  capability: string;
-  public: boolean;
-}
+  href: string;
+  icon: ExperienceIcon;
+  available: boolean;
+};
 
-export interface ExperienceDestination {
-  id: ExperienceId;
-  label: string;
-  capability: string;
-}
+export type ExperienceNavigation = {
+  experience: ExperienceId;
+  view?: string;
+  label?: string;
+};
