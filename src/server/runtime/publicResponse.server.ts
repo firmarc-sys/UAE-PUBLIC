@@ -1,20 +1,29 @@
-import type { PublicRuntimeResponse, RuntimeState } from '../../shared/contracts/runtime';
+import 'server-only';
 
-export function publicResponse<T>(
-  state: RuntimeState,
-  data?: T,
-): PublicRuntimeResponse<T> {
-  return {
-    ok: state.phase !== 'error',
-    state,
-    ...(data === undefined ? {} : { data }),
-  };
-}
+import type {
+  ExperienceId,
+  PublicIntentResponse,
+} from '@/shared/contracts';
 
-export function publicError(message: string): PublicRuntimeResponse<never> {
+type PrivateResolution = {
+  experience: ExperienceId;
+  view: string;
+  confidence: 'low' | 'medium' | 'high';
+  requestId: string;
+  summary?: string;
+  requiresInput?: boolean;
+};
+
+export function toPublicIntentResponse(
+  resolution: PrivateResolution,
+): PublicIntentResponse {
   return {
-    ok: false,
-    state: { phase: 'error', message },
-    error: message,
+    requestId: resolution.requestId,
+    experience: resolution.experience,
+    view: resolution.view,
+    confidence: resolution.confidence,
+    status: resolution.requiresInput ? 'needs_input' : 'ready',
+    summary: resolution.summary,
+    requiresInput: resolution.requiresInput,
   };
 }
