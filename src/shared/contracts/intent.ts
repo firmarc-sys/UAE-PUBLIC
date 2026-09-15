@@ -1,12 +1,27 @@
-import type { ExperienceId } from './experience';
+import type { ExperienceId, ExperienceStatus } from './experience';
 
-export interface PublicIntent {
+export type IntentConfidence = 'low' | 'medium' | 'high';
+
+export type PublicIntentRequest = {
   text: string;
-  experience?: ExperienceId;
-  context?: Record<string, unknown>;
-}
+  sessionId?: string;
+  currentExperience?: ExperienceId;
+  currentView?: string;
+};
 
-export interface RoutedIntent extends PublicIntent {
+export type PublicIntentResponse = {
+  requestId: string;
   experience: ExperienceId;
-  capability: string;
-}
+  view: string;
+  confidence: IntentConfidence;
+  status: ExperienceStatus;
+  summary?: string;
+  requiresInput?: boolean;
+};
+
+export type IntentErrorResponse = {
+  requestId?: string;
+  status: 'error';
+  message: string;
+  retryable: boolean;
+};
