@@ -1,14 +1,29 @@
-import type { ExperienceDefinition } from '../../../shared/contracts/experience';
+import type { ReactNode } from 'react';
+import type { ExperienceDescriptor } from '@/shared/contracts';
 
-export interface ExperienceHeaderProps {
-  experience: ExperienceDefinition;
-}
+type Props = {
+  experience: ExperienceDescriptor;
+  actions?: ReactNode;
+  status?: ReactNode;
+};
 
-export function ExperienceHeader({ experience }: ExperienceHeaderProps) {
+export default function ExperienceHeader({
+  experience,
+  actions,
+  status,
+}: Props) {
   return (
-    <header className="experience-header" data-experience={experience.id}>
-      <h1>{experience.label}</h1>
-      <p>{experience.description}</p>
+    <header className="experience-header">
+      <div className="experience-header-copy">
+        <span>{experience.tagline}</span>
+        <h1>{experience.label}</h1>
+        <p>{experience.description}</p>
+      </div>
+
+      <div className="experience-header-actions">
+        {status}
+        {actions}
+      </div>
     </header>
   );
 }
