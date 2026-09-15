@@ -1,28 +1,71 @@
-import type { ExperienceId } from '../../shared/contracts/experience';
-import type { PublicIntent } from '../../shared/contracts/intent';
-import { EXPERIENCES } from '../../shared/constants/experiences';
-import { primaryCapability } from './capabilityGraph.server';
+import 'server-only';
 
-export interface RouteDecision {
+import type { ExperienceId } from '@/shared/contracts';
+
+export type RoutingDecision = {
   experience: ExperienceId;
-  capability: string;
-}
+  view: string;
+  confidence: 'low' | 'medium' | 'high';
+};
 
-const DEFAULT_EXPERIENCE: ExperienceId = 'interweb';
+const KEYWORDS: Array<{
+  terms: string[];
+  decision: RoutingDecision;
+}> = [
+  {
+    terms: ['search', 'research', 'find', 'learn about', 'compare'],
+    decision: {
+      experience: 'interweb',
+      view: 'search',
+      confidence: 'high',
+    },
+  },
+  {
+    terms: ['write', 'note', 'document', 'summarize', 'draft'],
+    decision: {
+      experience: 'scribe',
+      view: 'compose',
+      confidence: 'high',
+    },
+  },
+  {
+    terms: ['build', 'code', 'debug', 'test', 'deploy', 'repository'],
+    decision: {
+      experience: 'code',
+      view: 'workspace',
+      confidence: 'high',
+    },
+  },
+  {
+    terms: ['camera', 'photo', 'image', 'visual', 'capture', 'analyze this'],
+    decision: {
+      experience: 'optics',
+      view: 'capture',
+      confidence: 'high',
+    },
+  },
+  {
+    terms: ['plan', 'focus', 'habit', 'wellness', 'improve myself'],
+    decision: {
+      experience: 'augment',
+      view: 'home',
+      confidence: 'medium',
+    },
+  },
+];
 
-export function resolveExperience(intent: PublicIntent): RouteDecision {
-  const experience = intent.experience ?? inferExperience(intent.text) ?? DEFAULT_EXPERIENCE;
+export function decideExperience(intent: string): RoutingDecision {
+  const normalized = intent.toLowerCase();
+
+  for (const rule of KEYWORDS) {
+    if (rule.terms.some((term) => normalized.includes(term))) {
+      return rule.decision;
+    }
+  }
 
   return {
-    experience,
-    capability: primaryCapability(experience),
+    experience: 'router',
+    view: 'home',
+    confidence: 'low',
   };
-}
-
-function inferExperience(text: string): ExperienceId | undefined {
-  const normalized = text.toLowerCase();
-
-  return EXPERIENCES.find((experience) =>
-    normalized.includes(experience.id),
-  )?.id;
 }
