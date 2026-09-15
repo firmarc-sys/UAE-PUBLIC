@@ -1,17 +1,45 @@
-import type { ExperienceId } from './experience';
+import type { ExperienceId, ExperienceStatus } from './experience';
 
-export type RuntimePhase = 'idle' | 'routing' | 'active' | 'error';
+export type RuntimeConnectionState =
+  | 'connecting'
+  | 'online'
+  | 'offline'
+  | 'error';
 
-export interface RuntimeState {
-  phase: RuntimePhase;
-  experience?: ExperienceId;
-  capability?: string;
-  message?: string;
-}
+export type RuntimeState = {
+  activeExperience: ExperienceId;
+  activeView: string;
+  status: ExperienceStatus;
+  connection: RuntimeConnectionState;
+  requestId: string | null;
+  lastIntent: string | null;
+};
 
-export interface PublicRuntimeResponse<T = unknown> {
-  ok: boolean;
-  state: RuntimeState;
-  data?: T;
-  error?: string;
-}
+export type RuntimeAction =
+  | {
+      type: 'navigate';
+      experience: ExperienceId;
+      view?: string;
+    }
+  | {
+      type: 'set_status';
+      status: ExperienceStatus;
+    }
+  | {
+      type: 'set_connection';
+      connection: RuntimeConnectionState;
+    }
+  | {
+      type: 'intent_started';
+      requestId: string;
+      text: string;
+    }
+  | {
+      type: 'intent_resolved';
+      experience: ExperienceId;
+      view: string;
+      requestId: string;
+    }
+  | {
+      type: 'intent_failed';
+    };
