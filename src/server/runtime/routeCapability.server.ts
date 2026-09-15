@@ -1,12 +1,19 @@
-import type { PublicIntent, RoutedIntent } from '../../shared/contracts/intent';
-import { resolveExperience } from '../internal/orchestrationPolicy.server';
+import 'server-only';
 
-export function routeCapability(intent: PublicIntent): RoutedIntent {
-  const route = resolveExperience(intent);
+import type { PublicIntentRequest } from '@/shared/contracts';
+import { createCorrelationId } from '@/lib/correlation';
+import { decideExperience } from '../internal/orchestrationPolicy.server';
+import { toPublicIntentResponse } from './publicResponse.server';
 
-  return {
-    ...intent,
-    experience: route.experience,
-    capability: route.capability,
-  };
+export async function routeCapability(request: PublicIntentRequest) {
+  const requestId = createCorrelationId();
+  const decision = decideExperience(request.text);
+
+  return toPublicIntentResponse({
+    requestId,
+    experience: decision.experience,
+    view: decision.view,
+    confidence: decision.confidence,
+    summary: `Opening ${decision.experience}.`,
+  });
 }
