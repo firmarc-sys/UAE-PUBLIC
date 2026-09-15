@@ -1,13 +1,30 @@
-import type { RuntimePhase } from '../../shared/contracts/runtime';
+import type { ExperienceStatus } from '@/shared/contracts';
 
-export interface MercuryStatusBadgeProps {
-  status: RuntimePhase;
-}
+type Props = {
+  status: ExperienceStatus;
+  label?: string;
+};
 
-export function MercuryStatusBadge({ status }: MercuryStatusBadgeProps) {
+const LABELS: Record<ExperienceStatus, string> = {
+  idle: 'Idle',
+  loading: 'Loading',
+  ready: 'Ready',
+  working: 'Working',
+  needs_input: 'Needs input',
+  empty: 'No activity yet',
+  offline: 'Offline',
+  error: 'Needs attention',
+};
+
+export default function MercuryStatusBadge({ status, label }: Props) {
   return (
-    <span className="mercury-status-badge" data-status={status} role="status">
-      {status}
+    <span
+      className="mercury-status-badge"
+      data-status={status}
+      aria-label={label ?? LABELS[status]}
+    >
+      <i aria-hidden="true" />
+      {label ?? LABELS[status]}
     </span>
   );
 }
